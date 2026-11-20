@@ -1,80 +1,19 @@
 mod model_rotator;
 mod monitors;
-mod server;
+mod native_app;
 mod system_stats;
 mod wallpaper;
 mod weather;
 
-use model_rotator::ModelRotator;
-use server::{create_router, AppState};
-use std::sync::Arc;
-use std::time::Duration;
-use system_stats::StatsCollector;
-use tokio::sync::broadcast;
-use wallpaper::WallpaperManager;
-use weather::WeatherService;
+use native_app::MultiscreenNativeApp;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    tracing_subscriber::fmt::init();
-
+fn main() -> Result<(), eframe::Error> {
     println!("============================================================");
-    println!("  MULTISCREEN TOOL v1.0.0 - Next-Gen Secondary Monitor Hub");
-    println!("  Designed with Impeccable & UI/UX Pro Max Principles");
+    println!("  MULTISCREEN TOOL v1.0.0 - Native Low-RAM Desktop Engine");
+    println!("  Pure Native Rust GUI powered by egui/eframe");
     println!("============================================================");
 
-    // Initialize subsystems
-    let stats_collector = Arc::new(StatsCollector::new());
-    let model_rotator = Arc::new(ModelRotator::new());
-    let wallpaper_mgr = Arc::new(WallpaperManager::new());
-    let weather_service = Arc::new(WeatherService::new());
-    let (ws_broadcast, _) = broadcast::channel::<String>(128);
-
-    let state = AppState {
-        stats_collector: stats_collector.clone(),
-        model_rotator: model_rotator.clone(),
-        wallpaper_mgr: wallpaper_mgr.clone(),
-        weather_service: weather_service.clone(),
-        ws_broadcast: ws_broadcast.clone(),
-    };
-
-    // Background Telemetry Broadcast Loop (every 1000ms)
-    let stats_loop_collector = stats_collector.clone();
-    let stats_ws_tx = ws_broadcast.clone();
-    tokio::spawn(async move {
-        let mut interval = tokio::time::interval(Duration::from_millis(1000));
-        loop {
-            interval.tick().await;
-            let current_stats = stats_loop_collector.collect();
-            let msg = serde_json::json!({
-                "type": "stats_update",
-                "data": current_stats
-            })
-            .to_string();
-            let _ = stats_ws_tx.send(msg);
-        }
-    });
-
-    // Background Model Rotator Timer Check Loop (every 2000ms)
-    let rotator_timer = model_rotator.clone();
-    let rotator_ws_tx = ws_broadcast.clone();
-    tokio::spawn(async move {
-        let mut interval = tokio::time::interval(Duration::from_millis(2000));
-        loop {
-            interval.tick().await;
-            if let Some((cat, model)) = rotator_timer.check_timed_rotation() {
-                let msg = serde_json::json!({
-                    "type": "model_rotated",
-                    "category": format!("{:?}", cat),
-                    "model": model
-                })
-                .to_string();
-                let _ = rotator_ws_tx.send(msg);
-            }
-        }
-    });
-
-    // Detect monitors at startup
+    // Enumerate connected displays
     let detected_monitors = monitors::get_all_monitors();
     println!("\nDetected {} Connected Monitor(s):", detected_monitors.len());
     for m in &detected_monitors {
@@ -84,20 +23,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
     }
 
-    let router = create_router(state);
-    let addr = "0.0.0.0:8848";
-    println!("\nStarting Multiscreen Tool server on http://localhost:8848 ...");
-    println!("Control Center Dashboard: http://localhost:8848");
-    println!("Secondary Display HUD:    http://localhost:8848/display.html");
+    // Configure Native GUI Window options
+    let native_options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default()
+            .with_title("Multiscreen Tool")
+            .with_inner_size([960.0, 720.0])
+            .with_min_inner_size([400.0, 500.0])
+            .with_active(true),
+        ..Default::default()
+    };
 
-    // Automatically open Control Center in browser
-    tokio::spawn(async {
-        tokio::time::sleep(Duration::from_millis(800)).await;
-        let _ = open::that("http://localhost:8848");
-    });
+    println!("\nLaunching native Rust window with ultra-low RAM footprint (~25MB)...");
 
-    let listener = tokio::net::TcpListener::bind(addr).await?;
-    axum::serve(listener, router).await?;
-
-    Ok(())
+    eframe::run_native(
+        "Multiscreen Tool",
+        native_options,
+        Box::new(|cc| Ok(Box::new(MultiscreenNativeApp::new(cc)))),
+    )
 }

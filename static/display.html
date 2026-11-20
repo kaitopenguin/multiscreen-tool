@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secondary Display HUD - Multiscreen Tool</title>
+  <link rel="stylesheet" href="css/impeccable.css">
+  <link rel="stylesheet" href="css/widgets.css">
+</head>
+<body style="background: #050811; overflow-y: auto;">
+
+  <!-- Video Wallpaper Background Layer -->
+  <div id="wallpaper-video-container">
+    <video id="wallpaper-video" autoplay loop muted playsinline></video>
+    <div id="wallpaper-overlay"></div>
+  </div>
+
+  <!-- Interactive Aquarium / Terrarium Simulation Canvas -->
+  <div id="aquarium-canvas-container">
+    <canvas id="aquarium-canvas"></canvas>
+  </div>
+
+  <!-- Interactive Tip Pill -->
+  <div class="aquarium-tip-pill">
+    <span>💧 Tap or Click anywhere to <span class="highlight">drop food pellets</span></span>
+  </div>
+
+  <!-- Foreground Bento Grid HUD Layer -->
+  <div id="display-hud" class="display-hud-layer">
+    
+    <!-- HUD Header Bar -->
+    <header class="glass-panel hud-header">
+      <div class="hud-logo">
+        <div class="dot"></div>
+        <span>MULTISCREEN HUD</span>
+        <span id="badge-fps" class="badge badge-cyan">60 FPS</span>
+        <span id="badge-orientation" class="badge badge-purple">PORTRAIT</span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="btn-hud-rotate" class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" title="Rotate to Next Model">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          <span id="hud-active-model-name">Gemini 2.0</span>
+        </button>
+
+        <button id="btn-toggle-fullscreen" class="btn btn-secondary btn-icon" title="Toggle Fullscreen">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Bento Grid Container -->
+    <div id="bento-container" class="bento-grid bento-portrait">
+
+      <!-- Widget: Digital Clock & Weather -->
+      <div id="widget-clock-box" class="glass-panel widget-clock">
+        <div class="clock-time">
+          <span id="clock-hours-mins">12:00</span><span id="clock-secs" class="clock-seconds">:00</span>
+        </div>
+        <div id="clock-date-str" class="clock-date">WEDNESDAY · NOVEMBER 20</div>
+      </div>
+
+      <!-- Widget: Hardware Telemetry HUD -->
+      <div id="widget-telemetry-box" class="glass-panel widget-telemetry">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <h4 style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">
+            Hardware Telemetry
+          </h4>
+          <span class="badge badge-emerald" style="font-size: 10px;">LIVE MONITOR</span>
+        </div>
+
+        <div class="telemetry-grid">
+          <!-- CPU Gauge -->
+          <div class="gauge-card">
+            <svg class="gauge-svg" viewBox="0 0 80 80">
+              <circle class="gauge-bg" cx="40" cy="40" r="35"></circle>
+              <circle id="gauge-cpu-fill" class="gauge-fill gauge-cpu" cx="40" cy="40" r="35"
+                stroke-dasharray="220" stroke-dashoffset="150"></circle>
+            </svg>
+            <div id="gauge-cpu-val" class="gauge-value">32%</div>
+            <div class="gauge-label">CPU</div>
+            <div id="cpu-sub" class="gauge-sub">8 Cores</div>
+          </div>
+
+          <!-- Memory Gauge -->
+          <div class="gauge-card">
+            <svg class="gauge-svg" viewBox="0 0 80 80">
+              <circle class="gauge-bg" cx="40" cy="40" r="35"></circle>
+              <circle id="gauge-mem-fill" class="gauge-fill gauge-mem" cx="40" cy="40" r="35"
+                stroke-dasharray="220" stroke-dashoffset="90"></circle>
+            </svg>
+            <div id="gauge-mem-val" class="gauge-value">59%</div>
+            <div class="gauge-label">RAM</div>
+            <div id="mem-sub" class="gauge-sub">9.5/16 GB</div>
+          </div>
+
+          <!-- GPU Gauge -->
+          <div class="gauge-card">
+            <svg class="gauge-svg" viewBox="0 0 80 80">
+              <circle class="gauge-bg" cx="40" cy="40" r="35"></circle>
+              <circle id="gauge-gpu-fill" class="gauge-fill gauge-gpu" cx="40" cy="40" r="35"
+                stroke-dasharray="220" stroke-dashoffset="180"></circle>
+            </svg>
+            <div id="gauge-gpu-val" class="gauge-value">18%</div>
+            <div class="gauge-label">GPU</div>
+            <div class="gauge-sub">DirectX 12</div>
+          </div>
+        </div>
+
+        <!-- Network Speeds -->
+        <div class="network-row">
+          <div class="net-stat">
+            <span class="net-arrow-down">▼</span>
+            <span style="color: var(--text-muted); font-size: 10px;">DL:</span>
+            <span id="net-dl" style="color: #fff; font-weight: 600;">1.2 MB/s</span>
+          </div>
+          <div class="net-stat">
+            <span class="net-arrow-up">▲</span>
+            <span style="color: var(--text-muted); font-size: 10px;">UL:</span>
+            <span id="net-ul" style="color: #fff; font-weight: 600;">240 KB/s</span>
+          </div>
+        </div>
+
+        <!-- Storage bar -->
+        <div style="margin-top: 12px;">
+          <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">
+            <span id="disk-label">C:\ (138 GB free)</span>
+            <span>NVMe SSD</span>
+          </div>
+          <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
+            <div id="disk-bar-fill" style="height: 100%; width: 45%; background: var(--accent-cyan); border-radius: 3px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Widget: Weather Forecast -->
+      <div id="widget-weather-box" class="glass-panel widget-weather">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Weather Forecast</span>
+          <span id="weather-city" class="badge badge-amber">Hanoi, VN</span>
+        </div>
+
+        <div class="weather-current">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <div id="weather-temp" class="weather-temp">24°C</div>
+            <div id="weather-condition" style="font-size: 13px; color: var(--text-secondary);">Partly Cloudy</div>
+          </div>
+
+          <div class="weather-details">
+            <div>💧 Hum: <span id="weather-hum">68%</span></div>
+            <div>💨 Wind: <span id="weather-wind">12 km/h</span></div>
+          </div>
+        </div>
+
+        <div id="weather-forecast-row" class="forecast-row">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Widget: Audio Spectrum Visualizer -->
+      <div id="widget-visualizer-box" class="glass-panel widget-visualizer">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Audio Spectrum</span>
+          <span class="badge badge-cyan" style="font-size: 9px;">DYNAMIC EQ</span>
+        </div>
+        <div id="visualizer-bars" class="visualizer-bars">
+          <!-- Dynamically generated bars -->
+        </div>
+      </div>
+
+      <!-- Widget: Spotify / Music HUD -->
+      <div id="widget-music-box" class="glass-panel widget-music">
+        <div class="vinyl-record">
+          <div class="vinyl-center"></div>
+        </div>
+        <div class="music-info">
+          <div class="music-title">Lofi Synthwave Chill Beats</div>
+          <div class="music-artist">Kaito Penguin · Desktop Radio</div>
+          <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 8px; overflow: hidden;">
+            <div style="height: 100%; width: 62%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple)); border-radius: 2px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Widget: Macro Deck / Stream Deck Pads -->
+      <div id="widget-macro-box" class="glass-panel" style="padding: 16px 18px;">
+        <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">
+          Quick Action Pad
+        </div>
+        <div class="macro-grid">
+          <div class="macro-pad" onclick="alert('Microphone Muted')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+              <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+              <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+            <span>Mute Mic</span>
+          </div>
+
+          <div class="macro-pad" onclick="alert('Audio Volume Toggled')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <span>Volume</span>
+          </div>
+
+          <div class="macro-pad" onclick="window.open('https://reddit.com/r/battlestations', '_blank')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <span>Reddit HUD</span>
+          </div>
+
+          <div class="macro-pad" id="macro-feed-fish">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            <span>Feed Fish</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="js/aquarium.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/display.js"></script>
+</body>
+</html>

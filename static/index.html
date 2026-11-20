@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiscreen Tool - Control Center</title>
+  <link rel="stylesheet" href="css/impeccable.css">
+  <style>
+    .dashboard-layout {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .brand-tag {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: var(--accent-cyan-dim);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+    .monitor-map-canvas {
+      width: 100%;
+      height: 180px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--border-medium);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .monitor-box {
+      border: 2px solid var(--border-subtle);
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      position: absolute;
+    }
+    .monitor-box:hover, .monitor-box.active {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px var(--accent-cyan-glow);
+      color: #fff;
+    }
+    .monitor-box.primary {
+      border-color: var(--accent-purple);
+    }
+    .monitor-box.primary:hover, .monitor-box.primary.active {
+      border-color: var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    
+    <!-- Top Header -->
+    <header class="header-bar">
+      <div>
+        <div class="brand-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          Multiscreen Tool
+          <span class="brand-tag">RUST CORE v1.0</span>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">
+          Next-generation secondary screen engine: video wallpaper, telemetry, interactive aquarium & multi-model rotator.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 12px;">
+        <button id="btn-quick-preview" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          Preview Secondary HUD
+        </button>
+        <button id="btn-launch-fullscreen" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+          Launch on Secondary Screen
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px;">
+
+      <!-- Left Column: Display & Video Wallpaper Settings -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+
+        <!-- Monitor Selector & Desktop Layout Map -->
+        <div class="glass-panel" style="padding: 22px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <h3>Display & Orientation Setup</h3>
+            <span id="detected-count-badge" class="badge badge-cyan">2 Screens Connected</span>
+          </div>
+
+          <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 14px;">
+            Interactive desktop placement: select which display will run the video wallpaper and interactive HUD.
+          </p>
+
+          <!-- Visual Monitor Map -->
+          <div id="monitor-map" class="monitor-map-canvas">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- Configuration Controls -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px;">
+            <div class="form-group">
+              <label class="form-label">Target Screen</label>
+              <select id="select-target-monitor" class="form-control">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Screen Orientation</label>
+              <select id="select-orientation" class="form-control">
+                <option value="auto">Auto-Detect from Screen</option>
+                <option value="Portrait">Vertical (Portrait - 9:16)</option>
+                <option value="Landscape">Horizontal (Landscape - 16:9)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Target Resolution</label>
+              <select id="select-resolution" class="form-control">
+                <option value="native">Native Screen Resolution</option>
+                <option value="768x1360">768 x 1360 (Portrait Laptop LCD)</option>
+                <option value="1080x1920">1080 x 1920 (FHD Portrait)</option>
+                <option value="1920x1080">1920 x 1080 (FHD Landscape)</option>
+                <option value="2560x1440">2560 x 1440 (2K QHD)</option>
+                <option value="3840x2160">3840 x 2160 (4K UHD)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Target Frame Rate (FPS)</label>
+              <select id="select-fps" class="form-control">
+                <option value="60">60 FPS (Balanced Smooth)</option>
+                <option value="30">30 FPS (Eco / Battery Saver)</option>
+                <option value="120">120 FPS (High Refresh Rate)</option>
+                <option value="144">144 FPS (Ultra Smooth Gaming)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+            <div>
+              <div style="font-weight: 500; font-size: 13px;">Always on Top Mode</div>
+              <div style="font-size: 11px; color: var(--text-muted);">Keep widgets visible above other windows</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-always-on-top" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Video Wallpaper Configurator -->
+        <div class="glass-panel" style="padding: 22px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <h3>Live Video Wallpaper</h3>
+            <span class="badge badge-emerald">Hardware Accelerated</span>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label">Discovered Video Files (Downloads & Videos)</label>
+            <select id="select-video-file" class="form-control">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label">Or Custom Video Path (MP4, WebM, MKV, MOV)</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="input-custom-video-path" class="form-control" placeholder="C:\path\to\your\video.mp4" style="flex: 1;">
+              <button id="btn-apply-video" class="btn btn-secondary">Apply Video</button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px;">
+            <div class="form-group">
+              <label class="form-label">Aspect Fit Mode</label>
+              <select id="select-video-fit" class="form-control">
+                <option value="cover">Cover (Fill Screen, No Black Bars)</option>
+                <option value="contain">Contain (Fit Whole Video)</option>
+                <option value="fill">Stretch (Exact Screen Fit)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Playback Speed</label>
+              <select id="select-video-speed" class="form-control">
+                <option value="1.0">1.0x (Normal)</option>
+                <option value="0.75">0.75x (Chill)</option>
+                <option value="0.5">0.5x (Slow Motion)</option>
+                <option value="1.25">1.25x</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Video Audio & Overlay Sliders -->
+          <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 14px;">
+            <div class="form-group">
+              <div class="form-label">
+                <span>Dark Backdrop Tint (Readability Filter)</span>
+                <span id="label-overlay-pct" class="mono">35%</span>
+              </div>
+              <input type="range" id="slider-overlay" min="0" max="80" value="35">
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <div style="font-weight: 500; font-size: 13px;">Mute Video Audio</div>
+                <div style="font-size: 11px; color: var(--text-muted);">Silent background video playback</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggle-video-mute" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Multi-Model Rotator & Widgets Manager -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+
+        <!-- Multi-Model Rotating Engine Center -->
+        <div class="glass-panel" style="padding: 22px; border-color: rgba(138, 43, 226, 0.3);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <div>
+              <h3>Model Rotating Framework</h3>
+              <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                Rotate & cycle multiple AI companions, creature models, and visual themes
+              </p>
+            </div>
+            <span class="badge badge-purple">Pluggable Engine</span>
+          </div>
+
+          <!-- Active AI Model Box -->
+          <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px; margin-top: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Active AI Companion</span>
+              <button id="btn-rotate-ai" class="btn btn-accent-purple" style="padding: 4px 10px; font-size: 11px;">
+                ↻ Rotate AI Model
+              </button>
+            </div>
+            <div id="active-ai-name" style="font-size: 16px; font-weight: 700; color: #fff; margin-top: 6px;">
+              Gemini 2.0 Flash
+            </div>
+            <div id="active-ai-desc" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+              Sub-second multimodal responses, ideal for real-time companion.
+            </div>
+          </div>
+
+          <!-- Active Creature Model Box -->
+          <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px; margin-top: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Active Aquarium Creature</span>
+              <button id="btn-rotate-creature" class="btn btn-primary" style="padding: 4px 10px; font-size: 11px;">
+                ↻ Rotate Creature
+              </button>
+            </div>
+            <div id="active-creature-name" style="font-size: 16px; font-weight: 700; color: var(--accent-cyan); margin-top: 6px;">
+              Japanese Nishikigoi
+            </div>
+            <div id="active-creature-desc" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+              Spotted koi fish swimming with fluid water drag physics.
+            </div>
+          </div>
+
+          <!-- Rotator Strategy Settings -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px;">
+            <div class="form-group">
+              <label class="form-label">Rotation Strategy</label>
+              <select id="select-strategy" class="form-control">
+                <option value="round_robin">Round-Robin (Every Action)</option>
+                <option value="timed">Timed Interval (Auto Cycle)</option>
+                <option value="manual">Manual Selection</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Auto-Rotation Timer</label>
+              <select id="select-interval" class="form-control">
+                <option value="60">Every 1 Minute</option>
+                <option value="300" selected>Every 5 Minutes</option>
+                <option value="900">Every 15 Minutes</option>
+                <option value="3600">Every 1 Hour</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Widget Toggle Manager -->
+        <div class="glass-panel" style="padding: 22px;">
+          <h3>Secondary Display Widgets</h3>
+          <p style="color: var(--text-secondary); font-size: 12px; margin-top: 4px; margin-bottom: 16px;">
+            Turn widgets on/off to curate your ideal companion dashboard.
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <span>Hardware Telemetry HUD (CPU, RAM, GPU, Net)</span>
+              <input type="checkbox" id="w-telemetry" checked>
+            </label>
+            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <span>Cyber Clock & Weather Forecast</span>
+              <input type="checkbox" id="w-clock-weather" checked>
+            </label>
+            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <span>Interactive Virtual Aquarium (Click to Feed)</span>
+              <input type="checkbox" id="w-aquarium" checked>
+            </label>
+            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <span>Audio Spectrum Visualizer</span>
+              <input type="checkbox" id="w-visualizer" checked>
+            </label>
+            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <span>Media & Spotify Now-Playing HUD</span>
+              <input type="checkbox" id="w-music" checked>
+            </label>
+            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <span>Macro Deck / Quick Action Pad</span>
+              <input type="checkbox" id="w-macro" checked>
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

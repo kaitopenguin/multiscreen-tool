@@ -1,0 +1,440 @@
+/* ==========================================================================
+   WIDGETS STYLES - HUD, AQUARIUM, TELEMETRY & MEDIA
+   ========================================================================== */
+
+/* Fullscreen Video Wallpaper Background */
+#wallpaper-video-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#wallpaper-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s ease;
+}
+
+#wallpaper-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(7, 10, 18, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+/* Aquarium Canvas Layer */
+#aquarium-canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+#aquarium-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Secondary Display Overlay HUD Layer */
+.display-hud-layer {
+  position: relative;
+  z-index: 2;
+  width: 100vw;
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  pointer-events: auto;
+}
+
+/* Header Bar */
+.hud-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+}
+
+.hud-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.hud-logo .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* Digital Clock HUD */
+.widget-clock {
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.clock-time {
+  font-family: var(--font-mono);
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #fff;
+  letter-spacing: -0.03em;
+  text-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
+}
+
+.clock-seconds {
+  font-size: 1.8rem;
+  color: var(--accent-cyan);
+  margin-left: 4px;
+}
+
+.clock-date {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Hardware Telemetry Widget */
+.widget-telemetry {
+  padding: 18px;
+}
+
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.gauge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  position: relative;
+}
+
+.gauge-svg {
+  width: 72px;
+  height: 72px;
+  transform: rotate(-90deg);
+}
+
+.gauge-bg {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 6;
+  fill: none;
+}
+
+.gauge-fill {
+  stroke-width: 6;
+  stroke-linecap: round;
+  fill: none;
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.gauge-cpu { stroke: var(--accent-cyan); }
+.gauge-mem { stroke: var(--accent-purple); }
+.gauge-gpu { stroke: var(--accent-emerald); }
+
+.gauge-value {
+  position: absolute;
+  top: 36px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.gauge-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gauge-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+
+/* Sparkline / Network Row */
+.network-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  margin-top: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.net-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.net-arrow-down { color: var(--accent-emerald); }
+.net-arrow-up { color: var(--accent-cyan); }
+
+/* Weather Widget */
+.widget-weather {
+  padding: 18px;
+}
+
+.weather-current {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.weather-temp {
+  font-size: 2.8rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.weather-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.forecast-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.forecast-chip {
+  padding: 8px 4px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  font-size: 10px;
+}
+
+/* Model Rotator Widget */
+.widget-rotator {
+  padding: 16px 18px;
+}
+
+.rotator-active-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  border-radius: var(--radius-sm);
+  margin-top: 10px;
+}
+
+.rotator-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rotator-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 14px;
+}
+
+.rotator-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Audio Visualizer */
+.widget-visualizer {
+  padding: 16px 18px;
+}
+
+.visualizer-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 54px;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.visualizer-bar {
+  flex: 1;
+  background: linear-gradient(to top, var(--accent-cyan), var(--accent-purple));
+  border-radius: 2px;
+  min-height: 4px;
+  transition: height 0.08s ease;
+}
+
+/* Spotify / Music HUD */
+.widget-music {
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vinyl-record {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #333 15%, #111 25%, #222 50%, #0a0a0a 70%);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  animation: spin-vinyl 4s linear infinite;
+}
+
+.vinyl-center {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent-rose);
+}
+
+@keyframes spin-vinyl {
+  100% { transform: rotate(360deg); }
+}
+
+.music-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.music-title {
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #fff;
+}
+
+.music-artist {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* Macro Deck / Stream Deck Pads */
+.macro-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.macro-pad {
+  padding: 12px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.macro-pad:hover {
+  background: rgba(0, 242, 254, 0.1);
+  border-color: var(--accent-cyan);
+  transform: translateY(-2px);
+}
+
+.macro-pad svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--accent-cyan);
+}
+
+.macro-pad span {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Aquarium Interaction Banner */
+.aquarium-tip-pill {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(12, 17, 29, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+}
+
+.aquarium-tip-pill span.highlight {
+  color: var(--accent-cyan);
+  font-weight: 600;
+}

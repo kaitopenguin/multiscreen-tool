@@ -1,16 +1,15 @@
+# Node & Electron dependencies
+node_modules/
+dist/
+
 # Rust build artifacts
 target/
 *.exe
 **/*.rs.bk
-*.pdb
 
-# IDE / Editor configs
-.idea/
+# System & IDE
 .vscode/
-*.swp
-*.swo
-
-# OS files
+.idea/
 Thumbs.db
 Desktop.ini
 .DS_Store

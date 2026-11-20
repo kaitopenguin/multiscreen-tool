@@ -1,0 +1,26 @@
+{
+  "name": "multiscreen-tool",
+  "version": "2.0.0",
+  "description": "Next-Gen Native Desktop Companion for Multi-Monitor & Vertical Screens",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-packager . multiscreen-tool --platform=win32 --arch=x64 --out=dist --overwrite --prune=true"
+  },
+  "keywords": [
+    "secondary-monitor",
+    "desktop-widgets",
+    "electron",
+    "aquarium",
+    "wallpaper-engine"
+  ],
+  "author": "kaitopenguin",
+  "license": "MIT",
+  "dependencies": {
+    "systeminformation": "^5.25.11"
+  },
+  "devDependencies": {
+    "electron": "^45.4.1",
+    "electron-packager": "^17.1.2"
+  }
+}

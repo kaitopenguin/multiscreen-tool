@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiscreen Tool - Control Center</title>
+  <link rel="stylesheet" href="src/css/impeccable-ios.css">
+  <style>
+    body {
+      padding: 24px;
+      background: radial-gradient(circle at 10% 10%, #0d1527 0%, #050811 100%);
+      min-height: 100vh;
+    }
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .app-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(0, 242, 254, 0.12);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-glass);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: var(--radius-squircle-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.14);
+      transform: translateY(-1px);
+    }
+    .btn-primary-launch {
+      background: linear-gradient(135deg, var(--accent-cyan), #00b4d8);
+      color: #050811;
+      border-color: transparent;
+      box-shadow: 0 4px 16px rgba(0, 242, 254, 0.4);
+    }
+    .btn-primary-launch:hover {
+      background: linear-gradient(135deg, #38bdf8, #00f2fe);
+      box-shadow: 0 6px 24px rgba(0, 242, 254, 0.6);
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 24px;
+    }
+    .section-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(28px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-squircle-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-ios);
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .section-subtitle {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+    .monitor-map-view {
+      width: 100%;
+      height: 140px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: var(--radius-squircle-md);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .map-box {
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 8px;
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .map-box.active {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px rgba(0, 242, 254, 0.4);
+      color: #fff;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .input-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .select-input, .text-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-glass);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: var(--radius-squircle-sm);
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .select-input:focus, .text-input:focus {
+      border-color: var(--accent-cyan);
+    }
+    .widget-picker-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 290px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .widget-picker-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 10px 14px;
+      border-radius: var(--radius-squircle-sm);
+      transition: all 0.2s ease;
+    }
+    .widget-picker-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .widget-item-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .widget-item-icon {
+      font-size: 18px;
+    }
+    .widget-item-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .widget-item-cat {
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    /* iOS Toggle Switch */
+    .ios-switch {
+      position: relative;
+      display: inline-block;
+      width: 38px;
+      height: 22px;
+    }
+    .ios-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 255, 255, 0.15);
+      transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 22px;
+    }
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #fff;
+      transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 50%;
+    }
+    input:checked + .switch-slider {
+      background-color: var(--accent-cyan);
+    }
+    input:checked + .switch-slider:before {
+      transform: translateX(16px);
+      background-color: #050811;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="app-header">
+    <div class="app-brand">
+      <span>🖥️</span>
+      Multiscreen Tool
+      <span class="app-tag">v2.0 DESKTOP</span>
+    </div>
+    <div style="display: flex; gap: 12px;">
+      <button id="btn-relaunch-hud" class="btn-action btn-primary-launch">
+        🚀 Launch Secondary HUD
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Settings Grid -->
+  <div class="main-grid">
+
+    <!-- Left Column: Display & Video Wallpaper -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+
+      <!-- Display Setup Card -->
+      <div class="section-card">
+        <div class="section-title">Display Placement & Orientation</div>
+        <div class="section-subtitle">Real-time detection of connected displays and desktop layout</div>
+
+        <div id="monitor-map-canvas" class="monitor-map-view">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label class="input-label">Target Monitor</label>
+            <select id="select-monitor" class="select-input"></select>
+          </div>
+          <div>
+            <label class="input-label">Target FPS Limit</label>
+            <select id="select-fps" class="select-input">
+              <option value="60">60 FPS (Silky Smooth)</option>
+              <option value="30">30 FPS (Eco / Low Battery)</option>
+              <option value="120">120 FPS (High Refresh)</option>
+              <option value="144">144 FPS (Ultra Gaming)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border-glass);">
+          <div>
+            <div style="font-size: 13px; font-weight: 600;">Always on Top Mode</div>
+            <div style="font-size: 11px; color: #94a3b8;">Float HUD above other secondary apps</div>
+          </div>
+          <label class="ios-switch">
+            <input type="checkbox" id="check-always-on-top" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Live Video Wallpaper Card -->
+      <div class="section-card">
+        <div class="section-title">Live Video Wallpaper</div>
+        <div class="section-subtitle">Auto-scanned videos from your Downloads & Videos folders</div>
+
+        <div style="margin-bottom: 12px;">
+          <label class="input-label">Select Video File</label>
+          <select id="select-video" class="select-input"></select>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label class="input-label">Aspect Fit Mode</label>
+            <select id="select-fit" class="select-input">
+              <option value="cover">Cover (Fill Screen, No Bars)</option>
+              <option value="contain">Contain (Full Aspect)</option>
+              <option value="fill">Stretch</option>
+            </select>
+          </div>
+          <div>
+            <label class="input-label">Playback Speed</label>
+            <select id="select-speed" class="select-input">
+              <option value="1.0">1.0x (Normal)</option>
+              <option value="0.75">0.75x (Chill)</option>
+              <option value="0.5">0.5x (Slow Motion)</option>
+              <option value="1.25">1.25x</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+          <div>
+            <div style="font-size: 13px; font-weight: 600;">Mute Audio</div>
+            <div style="font-size: 11px; color: #94a3b8;">Quiet background video playback</div>
+          </div>
+          <label class="ios-switch">
+            <input type="checkbox" id="check-mute" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Widget Customizer & Model Rotator -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+
+      <!-- Widget Customizer Card -->
+      <div class="section-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+          <div class="section-title">Customizable Widgets</div>
+          <span class="app-tag" id="active-widgets-count">8 Active</span>
+        </div>
+        <div class="section-subtitle">
+          Toggle and pick exactly which widgets appear on your secondary screen
+        </div>
+
+        <div class="widget-picker-list" id="widget-picker-container">
+          <!-- Dynamically populated from WIDGET_CATALOG -->
+        </div>
+      </div>
+
+      <!-- Fish Friend Companion & Model Rotator Card -->
+      <div class="section-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+          <div class="section-title">Fish Companion & AI Rotator</div>
+          <button class="btn-action" id="btn-rotate-models" style="padding: 4px 10px; font-size: 11px;">
+            ↻ Rotate AI Model
+          </button>
+        </div>
+        <div class="section-subtitle">Inspired by "Fish food for my fish friend 🐟" and multi-model routing</div>
+
+        <div class="form-row">
+          <div>
+            <label class="input-label">Active Fish Friend</label>
+            <select id="select-fish-friend" class="select-input">
+              <option value="clownfish">Nemo the Clownfish 🐠</option>
+              <option value="koi">Kohaku Japanese Koi 🎏</option>
+              <option value="axolotl">Lottie Pink Axolotl 🦎</option>
+            </select>
+          </div>
+          <div>
+            <label class="input-label">Active AI Model</label>
+            <input type="text" id="display-ai-model" class="text-input" value="Gemini 2.0 Flash" readonly>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="src/js/widget-manager.js"></script>
+  <script src="src/js/control-center.js"></script>
+</body>
+</html>

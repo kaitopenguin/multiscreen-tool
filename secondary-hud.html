@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multiscreen Tool - Secondary HUD</title>
+  <title>Caelestia Shell - Secondary Display HUD</title>
   <link rel="stylesheet" href="src/css/impeccable-ios.css">
   <style>
     html, body {
@@ -17,43 +17,53 @@
     }
   </style>
 </head>
-<body class="theme-arch">
+<body class="theme-catppuccin">
 
-  <!-- Docked Sidebar HUD Container -->
-  <div class="hud-wrapper">
+  <!-- Caelestia Floating Island HUD Container -->
+  <div class="caelestia-hud-frame">
     
-    <!-- Arch Linux Hyprland / Waybar Header Pill Bar -->
-    <header class="waybar-header">
-      <div class="waybar-group-left">
-        <div class="waybar-logo-pill">
-          <div class="waybar-status-dot"></div>
-          <span id="header-brand-tag">ARCH // WAYBAR</span>
+    <!-- Floating Waybar Pill Island -->
+    <header class="caelestia-waybar-island">
+      
+      <!-- Left: Arch Logo & Workspaces & Stat Chips -->
+      <div class="waybar-cluster">
+        <div class="arch-brand-pill">
+          <div class="arch-dot-pulse"></div>
+          <span id="header-brand-tag">ARCH // CAELESTIA</span>
         </div>
-        <span class="waybar-action-chip" id="hdr-cpu-chip" title="CPU Load"> 15%</span>
-        <span class="waybar-action-chip" id="hdr-mem-chip" title="RAM Usage"> 8.4G</span>
+
+        <div class="workspaces-pill">
+          <span class="ws-dot active"></span>
+          <span class="ws-dot"></span>
+          <span class="ws-dot"></span>
+        </div>
+
+        <span class="waybar-chip-btn" id="hdr-cpu-chip" title="CPU Load"> 14%</span>
+        <span class="waybar-chip-btn" id="hdr-mem-chip" title="RAM Usage">󰍛 8.4G</span>
       </div>
 
-      <div class="waybar-group-right">
-        <!-- Theme Quick Selector -->
-        <select id="hud-theme-select" class="waybar-select" title="Switch Theme">
-          <option value="arch">Arch Linux</option>
-          <option value="frutiger">Frutiger Aero</option>
-          <option value="retro">Retro CRT</option>
-          <option value="modern">Modern Slate</option>
+      <!-- Right: Omarchy Themes, Dock Controls & Customize -->
+      <div class="waybar-cluster">
+        <select id="hud-theme-select" class="theme-dropdown-select" title="Switch Omarchy Theme">
+          <option value="catppuccin">Catppuccin Sherbet</option>
+          <option value="tokyonight">Tokyo Night</option>
+          <option value="amberbyte">Amberbyte</option>
+          <option value="blueberry">Blueberry</option>
+          <option value="rosepine">Rose Pine</option>
+          <option value="gruvbox">Gruvbox Material</option>
+          <option value="nordic">Nordic Frost</option>
         </select>
 
-        <!-- Dock Position Controls -->
-        <button id="btn-dock-left" class="waybar-action-chip" title="Dock Left Side (Treo bên trái)">◧</button>
-        <button id="btn-dock-right" class="waybar-action-chip" title="Dock Right Side (Treo bên phải)">◨</button>
-        <button id="btn-dock-full" class="waybar-action-chip" title="Full Width (Toàn màn hình)">⛶</button>
-
-        <!-- Customize Widgets Button -->
-        <button id="btn-edit-widgets" class="waybar-action-chip" title="Customize Widgets">✨</button>
+        <button id="btn-dock-left" class="waybar-chip-btn" title="Dock Left (Treo bên trái)">◧</button>
+        <button id="btn-dock-right" class="waybar-chip-btn" title="Dock Right (Treo bên phải)">◨</button>
+        <button id="btn-dock-full" class="waybar-chip-btn" title="Full Width (Toàn màn hình)">⛶</button>
+        <button id="btn-edit-widgets" class="waybar-chip-btn" title="Customize Widgets">✨</button>
       </div>
+
     </header>
 
-    <!-- Modular Widget Bento Container -->
-    <main id="bento-widget-container" class="widget-grid-container"></main>
+    <!-- Caelestia Modular Widget Stack -->
+    <main id="bento-widget-container" class="caelestia-widget-list"></main>
 
   </div>
 

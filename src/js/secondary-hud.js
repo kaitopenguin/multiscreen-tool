@@ -1,7 +1,6 @@
 /**
- * SECONDARY HUD - DOCKED SIDEBAR CONTROLLER
- * Supports Arch Linux, Frutiger Aero, Retro CRT, and Modern themes.
- * Zero-lag 60fps rendering, live Waybar status pills, dock-left/dock-right controls.
+ * CAELESTIA SHELL - SECONDARY HUD CONTROLLER
+ * Hyprland floating island design, Omarchy 7 themes, Btop telemetry, zero-lag 60fps.
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -12,10 +11,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Config fetch error:', err);
   }
 
-  // 1. Theme Initialization
+  // 1. Theme Management (7 Omarchy Themes)
+  const validThemes = ['catppuccin', 'tokyonight', 'amberbyte', 'blueberry', 'rosepine', 'gruvbox', 'nordic'];
   function applyTheme(themeName) {
-    const valid = ['arch', 'frutiger', 'retro', 'modern'];
-    const active = valid.includes(themeName) ? themeName : 'arch';
+    // Map legacy names if any
+    let active = themeName;
+    if (active === 'arch') active = 'catppuccin';
+    if (active === 'retro') active = 'amberbyte';
+    if (active === 'modern' || active === 'frutiger') active = 'blueberry';
+    if (!validThemes.includes(active)) active = 'catppuccin';
+
     document.body.className = `theme-${active}`;
 
     const themeSelect = document.getElementById('hud-theme-select');
@@ -23,15 +28,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const brandTag = document.getElementById('header-brand-tag');
     if (brandTag) {
-      if (active === 'arch') brandTag.textContent = 'ARCH // WAYBAR';
-      else if (active === 'frutiger') brandTag.textContent = 'FRUTIGER AERO';
-      else if (active === 'retro') brandTag.textContent = 'RETRO // CRT';
-      else brandTag.textContent = 'MODERN SLATE';
+      const titles = {
+        catppuccin: 'ARCH // SHERBET',
+        tokyonight: 'ARCH // TOKYO',
+        amberbyte: 'ARCH // AMBER',
+        blueberry: 'ARCH // BLUEBERRY',
+        rosepine: 'ARCH // ROSE',
+        gruvbox: 'ARCH // GRUVBOX',
+        nordic: 'ARCH // NORDIC',
+      };
+      brandTag.textContent = titles[active] || 'ARCH // CAELESTIA';
     }
   }
-  applyTheme(config.theme || 'arch');
+  applyTheme(config.theme || 'catppuccin');
 
-  // Theme Dropdown listener
   const themeSelect = document.getElementById('hud-theme-select');
   if (themeSelect) {
     themeSelect.addEventListener('change', async (e) => {
@@ -41,26 +51,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 2. Docking Controls
+  // 2. Docking Side Controls
   const btnDockLeft = document.getElementById('btn-dock-left');
   const btnDockRight = document.getElementById('btn-dock-right');
   const btnDockFull = document.getElementById('btn-dock-full');
 
-  if (btnDockLeft) {
-    btnDockLeft.addEventListener('click', async () => {
-      await window.api.setDockMode('left');
-    });
-  }
-  if (btnDockRight) {
-    btnDockRight.addEventListener('click', async () => {
-      await window.api.setDockMode('right');
-    });
-  }
-  if (btnDockFull) {
-    btnDockFull.addEventListener('click', async () => {
-      await window.api.setDockMode('full');
-    });
-  }
+  if (btnDockLeft) btnDockLeft.addEventListener('click', () => window.api.setDockMode('left'));
+  if (btnDockRight) btnDockRight.addEventListener('click', () => window.api.setDockMode('right'));
+  if (btnDockFull) btnDockFull.addEventListener('click', () => window.api.setDockMode('full'));
 
   // 3. Initialize Modular Widget Manager
   const widgetContainer = document.getElementById('bento-widget-container');
@@ -68,8 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     container: widgetContainer,
     activeWidgets: config.activeWidgets || [
       'arch-waybar-status',
-      'fish-tank',
       'ios-clock',
+      'fish-tank',
       'system-telemetry',
       'ios-weather',
       'dynamic-music',
@@ -85,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   widgetMgr.render();
 
-  // Set initial companion model
+  // Set initial fish companion
   if (window.fishTankInstance && config.activeCreatureModel) {
     window.fishTankInstance.setCompanion(config.activeCreatureModel);
   }
@@ -103,60 +101,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (secEl) secEl.textContent = `:${secs}`;
 
     const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-    const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
-    const dateStr = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const dateStr = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}`;
     const dateEl = document.getElementById('ios-date-string');
     if (dateEl) dateEl.textContent = dateStr;
   }
   updateClock();
   setInterval(updateClock, 1000);
 
-  // 5. Telemetry Updates
+  // 5. Telemetry Updates (Native C++ V8 Engine)
   window.api.onTelemetry((stats) => {
-    // Header mini chips
+    // Top Waybar Quick Chips
     const hdrCpu = document.getElementById('hdr-cpu-chip');
     const hdrMem = document.getElementById('hdr-mem-chip');
     if (hdrCpu) hdrCpu.textContent = ` ${stats.cpu.usagePercent}%`;
-    if (hdrMem) hdrMem.textContent = ` ${stats.memory.usedGb}G`;
+    if (hdrMem) hdrMem.textContent = `󰍛 ${stats.memory.usedGb}G`;
 
-    // Circular Telemetry Gauges (macOS style)
+    // Btop Horizontal Progress Bars
     const cpuVal = document.getElementById('tel-cpu-val');
-    const cpuCircle = document.getElementById('tel-cpu-circle');
-    if (cpuVal) cpuVal.textContent = `${stats.cpu.usagePercent}%`;
-    if (cpuCircle) {
-      const offset = 201 - (201 * Math.min(100, stats.cpu.usagePercent)) / 100;
-      cpuCircle.style.strokeDashoffset = offset;
-    }
+    const cpuBar = document.getElementById('tel-cpu-bar');
+    if (cpuVal) cpuVal.textContent = `${stats.cpu.usagePercent}% (${stats.cpu.speedGhz} GHz)`;
+    if (cpuBar) cpuBar.style.width = `${Math.min(100, Math.max(0, stats.cpu.usagePercent))}%`;
 
     const memVal = document.getElementById('tel-mem-val');
-    const memCircle = document.getElementById('tel-mem-circle');
-    if (memVal) memVal.textContent = `${stats.memory.percent}%`;
-    if (memCircle) {
-      const offset = 201 - (201 * Math.min(100, stats.memory.percent)) / 100;
-      memCircle.style.strokeDashoffset = offset;
-    }
+    const memBar = document.getElementById('tel-mem-bar');
+    if (memVal) memVal.textContent = `${stats.memory.usedGb}G / ${stats.memory.totalGb}G (${stats.memory.percent}%)`;
+    if (memBar) memBar.style.width = `${Math.min(100, Math.max(0, stats.memory.percent))}%`;
 
     const diskVal = document.getElementById('tel-disk-val');
-    const diskCircle = document.getElementById('tel-disk-circle');
-    if (diskVal) diskVal.textContent = `${stats.disk.percent}%`;
-    if (diskCircle) {
-      const offset = 201 - (201 * Math.min(100, stats.disk.percent)) / 100;
-      diskCircle.style.strokeDashoffset = offset;
-    }
+    const diskBar = document.getElementById('tel-disk-bar');
+    if (diskVal) diskVal.textContent = `${stats.disk.usedGb}G / ${stats.disk.totalGb}G (${stats.disk.percent}%)`;
+    if (diskBar) diskBar.style.width = `${Math.min(100, Math.max(0, stats.disk.percent))}%`;
 
-    // Arch Linux Waybar Status Pills
+    // Arch Waybar Status Cluster
     const wbCpu = document.getElementById('wb-cpu');
     const wbMem = document.getElementById('wb-mem');
     const wbNet = document.getElementById('wb-net');
     const wbDisk = document.getElementById('wb-disk');
 
-    if (wbCpu) wbCpu.textContent = `CPU ${stats.cpu.usagePercent}%`;
-    if (wbMem) wbMem.textContent = `RAM ${stats.memory.usedGb}G`;
-    if (wbNet) wbNet.textContent = `▲${stats.network.uploadKb}K ▼${stats.network.downloadKb}K`;
-    if (wbDisk) wbDisk.textContent = `SSD ${stats.disk.percent}%`;
+    if (wbCpu) wbCpu.textContent = ` ${stats.cpu.usagePercent}%`;
+    if (wbMem) wbMem.textContent = `󰍛 ${stats.memory.usedGb}G`;
+    if (wbNet) wbNet.textContent = `󰖩 ▲${stats.network.uploadKb}K ▼${stats.network.downloadKb}K`;
+    if (wbDisk) wbDisk.textContent = `󰋊 ${stats.disk.percent}%`;
   });
 
-  // 6. Config Updated Listener from Control Center
+  // 6. Config Sync Listener
   window.api.onConfigUpdated((newCfg) => {
     config = newCfg;
     if (newCfg.theme) applyTheme(newCfg.theme);
@@ -168,7 +157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const nameLabel = document.getElementById('fish-friend-name');
       if (nameLabel) {
         if (newCfg.activeCreatureModel === 'koi') nameLabel.textContent = 'Kohaku Japanese Koi';
-        else if (newCfg.activeCreatureModel === 'axolotl') nameLabel.textContent = 'Lottie Pink Axolotl';
+        else if (newCfg.activeCreatureModel === 'axolotl') nameLabel.textContent = 'Lottie the Pink Axolotl';
         else if (newCfg.activeCreatureModel === 'puffer') nameLabel.textContent = 'Puffy Pufferfish';
         else nameLabel.textContent = 'Nemo the Clownfish';
       }

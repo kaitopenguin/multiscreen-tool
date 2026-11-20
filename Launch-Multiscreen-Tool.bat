@@ -1,4 +1,12 @@
 @echo off
-title Multiscreen Tool v2.0
-start "" "%~dp0dist\multiscreen-tool-win32-x64\multiscreen-tool.exe"
+title Multiscreen Tool v2.1 (Arch Linux Ricing)
+cd /d "%~dp0"
+
+if exist "dist\multiscreen-tool-win32-x64\multiscreen-tool.exe" (
+    start "" "dist\multiscreen-tool-win32-x64\multiscreen-tool.exe"
+) else if exist "node_modules\electron\dist\electron.exe" (
+    start "" "node_modules\electron\dist\electron.exe" .
+) else (
+    call npx.cmd electron .
+)
 exit

@@ -18,7 +18,7 @@ function loadConfig() {
     targetMonitorId: 1,
     dockMode: 'left', // 'left', 'right', 'full'
     dockWidth: 360,
-    theme: 'arch', // 'arch', 'frutiger', 'retro', 'modern'
+    theme: 'catppuccin', // 'catppuccin', 'tokyonight', 'amberbyte', 'blueberry', 'rosepine', 'gruvbox', 'nordic'
     wallpaperEnabled: false,
     wallpaperMonitorId: 1,
     videoPath: fs.existsSync(defaultVideo) ? defaultVideo : '',

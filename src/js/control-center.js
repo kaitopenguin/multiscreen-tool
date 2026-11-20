@@ -1,7 +1,6 @@
 /**
- * MULTISCREEN TOOL - CONTROL CENTER CONTROLLER
- * Features: Modular Tabs, Side-Docking settings, Arch Linux / Theme Switcher,
- * Widget catalog toggles, and Dedicated Independent Live Wallpaper Engine.
+ * CAELESTIA SHELL - CONTROL CENTER CONTROLLER
+ * Controls Displays, Side Docking, 7 Omarchy Themes, Widget Stack, and Live Wallpaper.
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -17,8 +16,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 2. Navigation Tab Switching
-  const tabBtns = document.querySelectorAll('.tab-btn');
-  const tabPanels = document.querySelectorAll('.tab-panel');
+  const tabBtns = document.querySelectorAll('.cc-tab-btn');
+  const tabPanels = document.querySelectorAll('.cc-panel');
 
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -62,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     if (screenInfoBadge) {
-      screenInfoBadge.textContent = `${monitors.length} Displays Connected`;
+      screenInfoBadge.textContent = `${monitors.length} Displays`;
     }
 
     renderMonitorMap();
@@ -124,7 +123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 4. Docking Mode & Width Slider
-  const dockCards = document.querySelectorAll('.dock-mode-card');
+  const dockCards = document.querySelectorAll('.cc-dock-card');
   const sliderWidth = document.getElementById('slider-dock-width');
   const widthValLabel = document.getElementById('dock-width-val');
 
@@ -163,13 +162,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 5. Theme System (Arch Linux, Frutiger Aero, Retro CRT, Modern Slate)
-  const themeCards = document.querySelectorAll('.theme-card');
+  // 5. 7 Omarchy Themes
+  const themeCards = document.querySelectorAll('.omarchy-theme-card');
   const currentThemeBadge = document.getElementById('current-theme-badge');
 
+  const validThemes = ['catppuccin', 'tokyonight', 'amberbyte', 'blueberry', 'rosepine', 'gruvbox', 'nordic'];
+
   function applyThemeLocal(themeName) {
-    const valid = ['arch', 'frutiger', 'retro', 'modern'];
-    const active = valid.includes(themeName) ? themeName : 'arch';
+    let active = themeName;
+    if (active === 'arch') active = 'catppuccin';
+    if (active === 'retro') active = 'amberbyte';
+    if (active === 'modern' || active === 'frutiger') active = 'blueberry';
+    if (!validThemes.includes(active)) active = 'catppuccin';
+
     document.body.className = `theme-${active}`;
 
     themeCards.forEach(card => {
@@ -182,15 +187,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (currentThemeBadge) {
       const titles = {
-        arch: 'Arch Linux Active',
-        frutiger: 'Frutiger Aero Active',
-        retro: 'Retro CRT Active',
-        modern: 'Modern Slate Active',
+        catppuccin: 'Catppuccin Sherbet Active',
+        tokyonight: 'Tokyo Night Active',
+        amberbyte: 'Amberbyte Active',
+        blueberry: 'Blueberry Active',
+        rosepine: 'Rose Pine Active',
+        gruvbox: 'Gruvbox Material Active',
+        nordic: 'Nordic Frost Active',
       };
-      currentThemeBadge.textContent = titles[active] || 'Arch Linux Active';
+      currentThemeBadge.textContent = titles[active] || 'Catppuccin Sherbet Active';
     }
   }
-  applyThemeLocal(config.theme || 'arch');
+  applyThemeLocal(config.theme || 'catppuccin');
 
   themeCards.forEach(card => {
     card.addEventListener('click', async () => {
@@ -201,7 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // 6. Widget Customizer Picker List
+  // 6. Widget Stack Picker List
   const pickerContainer = document.getElementById('widget-picker-container');
   const countBadge = document.getElementById('active-widgets-count');
 
@@ -251,10 +259,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   renderWidgetPicker();
 
-  // 7. Fish Companion Model Selection
+  // 7. Fish Companion Model
   const selectFish = document.getElementById('select-fish-friend');
   if (selectFish) {
-    selectFish.value = config.activeCreatureModel || 'clownfish';
+    selectFish.value = config.activeCreatureModel || 'axolotl';
     selectFish.addEventListener('change', (e) => {
       config.activeCreatureModel = e.target.value;
       saveCurrentConfig();
@@ -276,7 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 9. Dedicated Video Wallpaper Studio
+  // 9. Dedicated Live Wallpaper
   const selectVideo = document.getElementById('select-video');
   const previewVideo = document.getElementById('cc-video-preview');
   const previewNone = document.getElementById('cc-video-none');
@@ -290,8 +298,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (wpStatusBadge) {
         if (res.isRunning) {
           wpStatusBadge.textContent = '● RUNNING';
-          wpStatusBadge.style.color = '#a6e3a1';
-          wpStatusBadge.style.borderColor = '#a6e3a1';
+          wpStatusBadge.style.color = 'var(--accent-green)';
+          wpStatusBadge.style.borderColor = 'var(--accent-green)';
         } else {
           wpStatusBadge.textContent = '○ STOPPED';
           wpStatusBadge.style.color = 'var(--text-dim)';
@@ -425,7 +433,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 12. Live Telemetry Updates (Native Node C++)
+  // 12. Live Telemetry Updates (Native C++ V8 Engine)
   window.api.onTelemetry((stats) => {
     const cpuEl = document.getElementById('cc-tel-cpu');
     const memEl = document.getElementById('cc-tel-mem');
@@ -433,8 +441,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const netEl = document.getElementById('cc-tel-net');
 
     if (cpuEl) cpuEl.textContent = ` CPU: ${stats.cpu.usagePercent}% (${stats.cpu.speedGhz}GHz)`;
-    if (memEl) memEl.textContent = ` RAM: ${stats.memory.usedGb}G / ${stats.memory.totalGb}G (${stats.memory.percent}%)`;
-    if (diskEl) diskEl.textContent = ` SSD ${stats.disk.mount}: ${stats.disk.percent}% (${stats.disk.usedGb}G / ${stats.disk.totalGb}G)`;
-    if (netEl) netEl.textContent = `󰈀 NET: ▲${stats.network.uploadKb}K ▼${stats.network.downloadKb}K`;
+    if (memEl) memEl.textContent = `󰍛 RAM: ${stats.memory.usedGb}G / ${stats.memory.totalGb}G (${stats.memory.percent}%)`;
+    if (diskEl) diskEl.textContent = `󰋊 SSD ${stats.disk.mount}: ${stats.disk.percent}% (${stats.disk.usedGb}G / ${stats.disk.totalGb}G)`;
+    if (netEl) netEl.textContent = `󰖩 NET: ▲${stats.network.uploadKb}K ▼${stats.network.downloadKb}K`;
   });
 });

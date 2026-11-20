@@ -185,15 +185,17 @@ class WidgetManager {
     switch (id) {
       case 'fish-tank':
         wrapper.innerHTML = `
-          <div class="fish-tank-widget-wrapper">
-            <div class="widget-header-row">
-              <div class="widget-title-pill">
+          <div class="caelestia-tank-wrapper">
+            <div class="widget-card-header">
+              <div class="widget-pill-badge">
                 <span>🐟</span>
-                <span id="fish-friend-name">Nemo the Clownfish</span>
+                <span id="fish-friend-name">Lottie the Pink Axolotl</span>
               </div>
-              <div class="fish-feed-prompt">Tap water to drop flakes</div>
+              <div class="tank-prompt-sub">
+                <span>Tap water to drop flakes</span>
+              </div>
             </div>
-            <div class="fish-tank-viewport">
+            <div class="caelestia-tank-viewport">
               <canvas id="fish-tank-canvas"></canvas>
             </div>
           </div>
@@ -202,46 +204,51 @@ class WidgetManager {
 
       case 'ios-clock':
         wrapper.innerHTML = `
-          <div class="ios-clock-widget">
-            <div class="ios-clock-time">
-              <span id="ios-hours-mins">12:00</span><span id="ios-seconds" class="ios-secs">:00</span>
+          <div class="caelestia-clock-widget">
+            <div>
+              <span class="caelestia-clock-time" id="ios-hours-mins">12:00</span>
+              <span class="caelestia-clock-secs" id="ios-seconds">:00</span>
             </div>
-            <div id="ios-date-string" class="ios-clock-date">WEDNESDAY, NOVEMBER 20</div>
+            <div class="caelestia-clock-meta">
+              <div class="caelestia-date-chip" id="ios-date-string">WEDNESDAY, NOV 20</div>
+              <div class="caelestia-day-chip">ARCH LINUX DESKTOP</div>
+            </div>
           </div>
         `;
         break;
 
       case 'system-telemetry':
         wrapper.innerHTML = `
-          <div class="telemetry-widget-card">
-            <div class="widget-header-row">
-              <span class="widget-label">SYSTEM TELEMETRY</span>
-              <span class="status-dot-live">● LIVE</span>
+          <div class="btop-telemetry-container">
+            <div class="widget-card-header">
+              <span class="widget-pill-badge">󰻠 HARDWARE // BTOP</span>
+              <span style="font-family: var(--font-mono); font-size: 10px; color: var(--accent-green);">● LIVE</span>
             </div>
-            <div class="telemetry-gauges-row">
-              <div class="gauge-col">
-                <svg viewBox="0 0 76 76" class="circle-gauge">
-                  <circle cx="38" cy="38" r="32" class="gauge-track"></circle>
-                  <circle id="tel-cpu-circle" cx="38" cy="38" r="32" class="gauge-fill gauge-cyan"></circle>
-                </svg>
-                <div id="tel-cpu-val" class="gauge-center-text">24%</div>
-                <div class="gauge-sub-label">CPU</div>
+            <div class="btop-metric-row">
+              <div class="btop-metric-header">
+                <span>CPU LOAD</span>
+                <span class="btop-metric-val" id="tel-cpu-val">15%</span>
               </div>
-              <div class="gauge-col">
-                <svg viewBox="0 0 76 76" class="circle-gauge">
-                  <circle cx="38" cy="38" r="32" class="gauge-track"></circle>
-                  <circle id="tel-mem-circle" cx="38" cy="38" r="32" class="gauge-fill gauge-purple"></circle>
-                </svg>
-                <div id="tel-mem-val" class="gauge-center-text">52%</div>
-                <div class="gauge-sub-label">RAM</div>
+              <div class="btop-bar-track">
+                <div class="btop-bar-fill fill-cyan" id="tel-cpu-bar" style="width: 15%;"></div>
               </div>
-              <div class="gauge-col">
-                <svg viewBox="0 0 76 76" class="circle-gauge">
-                  <circle cx="38" cy="38" r="32" class="gauge-track"></circle>
-                  <circle id="tel-disk-circle" cx="38" cy="38" r="32" class="gauge-fill gauge-emerald"></circle>
-                </svg>
-                <div id="tel-disk-val" class="gauge-center-text">45%</div>
-                <div class="gauge-sub-label">SSD</div>
+            </div>
+            <div class="btop-metric-row">
+              <div class="btop-metric-header">
+                <span>RAM USAGE</span>
+                <span class="btop-metric-val" id="tel-mem-val">8.4G / 16.0G (52%)</span>
+              </div>
+              <div class="btop-bar-track">
+                <div class="btop-bar-fill fill-mauve" id="tel-mem-bar" style="width: 52%;"></div>
+              </div>
+            </div>
+            <div class="btop-metric-row">
+              <div class="btop-metric-header">
+                <span>SSD STORAGE (C:)</span>
+                <span class="btop-metric-val" id="tel-disk-val">114G / 249G (46%)</span>
+              </div>
+              <div class="btop-bar-track">
+                <div class="btop-bar-fill fill-green" id="tel-disk-bar" style="width: 46%;"></div>
               </div>
             </div>
           </div>
@@ -250,35 +257,26 @@ class WidgetManager {
 
       case 'arch-waybar-status':
         wrapper.innerHTML = `
-          <div class="arch-waybar-card">
-            <span class="waybar-chip chip-blue">🐧 ARCH</span>
-            <span class="waybar-chip" id="wb-cpu">CPU 24%</span>
-            <span class="waybar-chip" id="wb-mem">RAM 8.4G</span>
-            <span class="waybar-chip chip-green" id="wb-net">▲45K ▼124K</span>
-            <span class="waybar-chip chip-purple" id="wb-disk">SSD 45%</span>
+          <div class="caelestia-waybar-cluster">
+            <span class="cael-chip chip-cyan">󰣇 ARCH</span>
+            <span class="cael-chip" id="wb-cpu"> 14%</span>
+            <span class="cael-chip chip-mauve" id="wb-mem">󰍛 8.4G</span>
+            <span class="cael-chip chip-green" id="wb-net">󰖩 ▲24K ▼140K</span>
+            <span class="cael-chip chip-peach" id="wb-disk">󰋊 46%</span>
           </div>
         `;
         break;
 
       case 'ios-weather':
         wrapper.innerHTML = `
-          <div class="ios-weather-card">
-            <div class="weather-top">
-              <div>
-                <div class="weather-city">Hanoi, Vietnam</div>
-                <div class="weather-big-temp" id="weather-temp">24°</div>
-              </div>
-              <div class="weather-condition-col">
-                <div class="weather-condition-text" id="weather-cond">Partly Cloudy</div>
-                <div class="weather-high-low">H: 28° · L: 21°</div>
-              </div>
+          <div class="caelestia-weather-card">
+            <div>
+              <div class="weather-loc-tag">Hanoi, Vietnam</div>
+              <div class="weather-temp-big" id="weather-temp">24°</div>
             </div>
-            <div class="weather-chips-strip" id="weather-forecast-strip">
-              <div class="mini-forecast-chip"><div>Now</div><div class="chip-temp">24°</div></div>
-              <div class="mini-forecast-chip"><div>14:00</div><div class="chip-temp">26°</div></div>
-              <div class="mini-forecast-chip"><div>16:00</div><div class="chip-temp">25°</div></div>
-              <div class="mini-forecast-chip"><div>18:00</div><div class="chip-temp">23°</div></div>
-              <div class="mini-forecast-chip"><div>20:00</div><div class="chip-temp">22°</div></div>
+            <div>
+              <div class="weather-condition-pill" id="weather-cond">Partly Cloudy ⛅</div>
+              <div class="weather-range-pill">H: 28° · L: 21°</div>
             </div>
           </div>
         `;
@@ -286,17 +284,14 @@ class WidgetManager {
 
       case 'dynamic-music':
         wrapper.innerHTML = `
-          <div class="dynamic-music-card">
-            <div class="music-vinyl-record" id="vinyl-disc">
-              <div class="vinyl-groove"></div>
-              <div class="vinyl-center-art"></div>
+          <div class="caelestia-music-card">
+            <div class="music-album-art">
+              <div class="music-center-dot"></div>
             </div>
-            <div class="music-meta-col">
-              <div class="music-song-title">Lofi Synthwave Sunset</div>
-              <div class="music-artist-name">Kaito Penguin · Desktop Radio</div>
-              <div class="audio-spectrum-bars" id="music-spectrum-bars">
-                <!-- Dynamically generated bars -->
-              </div>
+            <div class="music-info-meta">
+              <div class="music-title-text">Lofi Synthwave Sunset</div>
+              <div class="music-artist-text">Caelestia Ambient · Arch Linux Radio</div>
+              <div class="cava-spectrum-strip" id="music-spectrum-bars"></div>
             </div>
           </div>
         `;
@@ -304,50 +299,49 @@ class WidgetManager {
 
       case 'macro-deck':
         wrapper.innerHTML = `
-          <div class="macro-deck-card">
-            <div class="macro-deck-title">CONTROL CENTER</div>
-            <div class="macro-tiles-grid">
-              <button class="macro-tile" onclick="alert('Microphone Muted')">
-                <span class="tile-icon">🎤</span>
-                <span>Mute Mic</span>
-              </button>
-              <button class="macro-tile" onclick="alert('Audio Muted')">
-                <span class="tile-icon">🔊</span>
-                <span>Volume</span>
-              </button>
-              <button class="macro-tile" id="tile-feed-fish">
-                <span class="tile-icon">🐟</span>
-                <span>Feed Fish</span>
-              </button>
-              <button class="macro-tile" onclick="window.open('https://reddit.com/r/battlestations')">
-                <span class="tile-icon">🌐</span>
-                <span>Reddit</span>
-              </button>
-            </div>
+          <div class="caelestia-macro-grid">
+            <button class="caelestia-macro-btn" onclick="alert('Microphone Muted')">
+              <span class="macro-icon">󰝟</span>
+              <span>Mute Mic</span>
+            </button>
+            <button class="caelestia-macro-btn" onclick="alert('Audio Muted')">
+              <span class="macro-icon">󰕾</span>
+              <span>Volume</span>
+            </button>
+            <button class="caelestia-macro-btn" id="tile-feed-fish">
+              <span class="macro-icon">🐟</span>
+              <span>Feed Fish</span>
+            </button>
+            <button class="caelestia-macro-btn" onclick="window.open('https://reddit.com/r/unixporn')">
+              <span class="macro-icon">󰈹</span>
+              <span>r/unixporn</span>
+            </button>
           </div>
         `;
         break;
 
       case 'model-rotator':
         wrapper.innerHTML = `
-          <div class="model-rotator-card">
-            <div class="rotator-header">
-              <span class="rotator-tag">AI ROTATOR</span>
-              <button class="btn-rotate-mini" id="btn-quick-rotate-hud">↻ Rotate</button>
+          <div class="caelestia-rotator-card">
+            <div>
+              <div class="widget-pill-badge" style="color: var(--accent-mauve);">󰚩 AI MODEL</div>
+              <div class="rotator-name-label" id="hud-model-name">Gemini 2.0 Flash</div>
             </div>
-            <div class="rotator-active-model" id="hud-model-name">Gemini 2.0 Flash</div>
-            <div class="rotator-strategy-note">Round-Robin Rotation Active</div>
+            <button class="waybar-chip-btn" id="btn-quick-rotate-hud">↻ Rotate</button>
           </div>
         `;
         break;
 
       case 'pomodoro':
         wrapper.innerHTML = `
-          <div class="pomodoro-card">
-            <div class="pomodoro-time" id="pomo-display">25:00</div>
-            <div class="pomodoro-controls">
-              <button class="pomo-btn" id="pomo-toggle">Start Focus</button>
-              <button class="pomo-btn pomo-reset" id="pomo-reset">Reset</button>
+          <div class="caelestia-rotator-card">
+            <div>
+              <div class="widget-pill-badge">󰔚 POMODORO</div>
+              <div class="caelestia-clock-time" style="font-size: 26px;" id="pomo-display">25:00</div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="waybar-chip-btn" id="pomo-toggle">Start</button>
+              <button class="waybar-chip-btn" id="pomo-reset">Reset</button>
             </div>
           </div>
         `;
@@ -355,12 +349,11 @@ class WidgetManager {
 
       case 'quick-notes':
         wrapper.innerHTML = `
-          <div class="quick-notes-card">
-            <div class="widget-header-row">
-              <span class="widget-label">DESK NOTES</span>
-              <span>📌</span>
+          <div>
+            <div class="widget-card-header">
+              <span class="widget-pill-badge">󰏫 DESK SCRATCHPAD</span>
             </div>
-            <textarea class="notes-textarea" placeholder="Type quick scratch notes here..."></textarea>
+            <textarea class="caelestia-notes-box" placeholder="Quick notes, commands, todo..."></textarea>
           </div>
         `;
         break;

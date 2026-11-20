@@ -1,7 +1,7 @@
 /**
- * SECONDARY HUD RENDERER LOGIC
- * Coordinates the vertical-optimized Bento Grid, Fish Friend companion, Video Wallpaper,
- * and live hardware telemetry on the secondary display.
+ * SECONDARY HUD - DOCKED SIDEBAR CONTROLLER
+ * Supports Arch Linux, Frutiger Aero, Retro CRT, and Modern themes.
+ * Zero-lag 60fps rendering, live Waybar status pills, dock-left/dock-right controls.
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -12,17 +12,67 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Config fetch error:', err);
   }
 
-  // 1. Initialize Widget Manager with selected widgets
+  // 1. Theme Initialization
+  function applyTheme(themeName) {
+    const valid = ['arch', 'frutiger', 'retro', 'modern'];
+    const active = valid.includes(themeName) ? themeName : 'arch';
+    document.body.className = `theme-${active}`;
+
+    const themeSelect = document.getElementById('hud-theme-select');
+    if (themeSelect) themeSelect.value = active;
+
+    const brandTag = document.getElementById('header-brand-tag');
+    if (brandTag) {
+      if (active === 'arch') brandTag.textContent = 'ARCH // WAYBAR';
+      else if (active === 'frutiger') brandTag.textContent = 'FRUTIGER AERO';
+      else if (active === 'retro') brandTag.textContent = 'RETRO // CRT';
+      else brandTag.textContent = 'MODERN SLATE';
+    }
+  }
+  applyTheme(config.theme || 'arch');
+
+  // Theme Dropdown listener
+  const themeSelect = document.getElementById('hud-theme-select');
+  if (themeSelect) {
+    themeSelect.addEventListener('change', async (e) => {
+      const selected = e.target.value;
+      applyTheme(selected);
+      await window.api.setTheme(selected);
+    });
+  }
+
+  // 2. Docking Controls
+  const btnDockLeft = document.getElementById('btn-dock-left');
+  const btnDockRight = document.getElementById('btn-dock-right');
+  const btnDockFull = document.getElementById('btn-dock-full');
+
+  if (btnDockLeft) {
+    btnDockLeft.addEventListener('click', async () => {
+      await window.api.setDockMode('left');
+    });
+  }
+  if (btnDockRight) {
+    btnDockRight.addEventListener('click', async () => {
+      await window.api.setDockMode('right');
+    });
+  }
+  if (btnDockFull) {
+    btnDockFull.addEventListener('click', async () => {
+      await window.api.setDockMode('full');
+    });
+  }
+
+  // 3. Initialize Modular Widget Manager
   const widgetContainer = document.getElementById('bento-widget-container');
   const widgetMgr = new WidgetManager({
     container: widgetContainer,
     activeWidgets: config.activeWidgets || [
+      'arch-waybar-status',
       'fish-tank',
       'ios-clock',
       'system-telemetry',
       'ios-weather',
       'dynamic-music',
-      'arch-waybar-status',
       'macro-deck',
       'model-rotator',
     ],
@@ -35,53 +85,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   widgetMgr.render();
 
-  // Set initial fish companion if present
+  // Set initial companion model
   if (window.fishTankInstance && config.activeCreatureModel) {
     window.fishTankInstance.setCompanion(config.activeCreatureModel);
-    const nameLabel = document.getElementById('fish-friend-name');
-    if (nameLabel) {
-      if (config.activeCreatureModel === 'koi') nameLabel.textContent = 'Kohaku Japanese Koi';
-      else if (config.activeCreatureModel === 'axolotl') nameLabel.textContent = 'Lottie Pink Axolotl';
-      else nameLabel.textContent = 'Nemo the Clownfish';
-    }
   }
 
-  // 2. Video Wallpaper Setup
-  const videoEl = document.getElementById('bg-video');
-  const overlayEl = document.getElementById('bg-overlay');
-
-  function applyWallpaper(cfg) {
-    if (!videoEl || !cfg) return;
-
-    if (cfg.videoPath) {
-      videoEl.style.display = 'block';
-      const fileUrl = `file:///${cfg.videoPath.replace(/\\/g, '/')}`;
-      if (videoEl.src !== fileUrl) {
-        videoEl.src = fileUrl;
-        videoEl.load();
-        videoEl.play().catch(e => console.log('Autoplay handled:', e));
-      }
-    } else {
-      // Fallback deep aquatic gradient
-      videoEl.style.display = 'none';
-      document.getElementById('bg-video-wrapper').style.background =
-        'radial-gradient(circle at 50% 30%, #0d1b2a 0%, #050811 100%)';
-    }
-
-    videoEl.muted = cfg.videoMuted !== false;
-    videoEl.playbackRate = cfg.videoSpeed || 1.0;
-    videoEl.style.objectFit = cfg.videoFit || 'cover';
-
-    if (overlayEl) {
-      overlayEl.style.background = `rgba(5, 8, 17, ${cfg.videoOverlayOpacity || 0.42})`;
-    }
-
-    const fpsBadge = document.getElementById('badge-fps-val');
-    if (fpsBadge) fpsBadge.textContent = `${cfg.targetFps || 60} FPS`;
-  }
-  applyWallpaper(config);
-
-  // 3. Digital Clock Ticker
+  // 4. Digital Clock Ticker
   function updateClock() {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
@@ -102,9 +111,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateClock();
   setInterval(updateClock, 1000);
 
-  // 4. Listen to Real-time Telemetry Updates
+  // 5. Telemetry Updates
   window.api.onTelemetry((stats) => {
-    // macOS Telemetry Gauges
+    // Header mini chips
+    const hdrCpu = document.getElementById('hdr-cpu-chip');
+    const hdrMem = document.getElementById('hdr-mem-chip');
+    if (hdrCpu) hdrCpu.textContent = ` ${stats.cpu.usagePercent}%`;
+    if (hdrMem) hdrMem.textContent = ` ${stats.memory.usedGb}G`;
+
+    // Circular Telemetry Gauges (macOS style)
     const cpuVal = document.getElementById('tel-cpu-val');
     const cpuCircle = document.getElementById('tel-cpu-circle');
     if (cpuVal) cpuVal.textContent = `${stats.cpu.usagePercent}%`;
@@ -141,33 +156,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (wbDisk) wbDisk.textContent = `SSD ${stats.disk.percent}%`;
   });
 
-  // 5. Config Sync Listener from Control Center
+  // 6. Config Updated Listener from Control Center
   window.api.onConfigUpdated((newCfg) => {
     config = newCfg;
-    applyWallpaper(newCfg);
-    widgetMgr.setWidgets(newCfg.activeWidgets, newCfg.widgetSizes);
-
-    // Companion sync
+    if (newCfg.theme) applyTheme(newCfg.theme);
+    if (newCfg.activeWidgets) {
+      widgetMgr.setWidgets(newCfg.activeWidgets, newCfg.widgetSizes);
+    }
     if (window.fishTankInstance && newCfg.activeCreatureModel) {
       window.fishTankInstance.setCompanion(newCfg.activeCreatureModel);
       const nameLabel = document.getElementById('fish-friend-name');
       if (nameLabel) {
         if (newCfg.activeCreatureModel === 'koi') nameLabel.textContent = 'Kohaku Japanese Koi';
         else if (newCfg.activeCreatureModel === 'axolotl') nameLabel.textContent = 'Lottie Pink Axolotl';
+        else if (newCfg.activeCreatureModel === 'puffer') nameLabel.textContent = 'Puffy Pufferfish';
         else nameLabel.textContent = 'Nemo the Clownfish';
       }
     }
-
     const modelName = document.getElementById('hud-model-name');
     if (modelName) modelName.textContent = newCfg.activeAiModel || 'Gemini 2.0 Flash';
   });
 
-  // 6. Navigation Buttons
-  document.getElementById('btn-edit-widgets').addEventListener('click', () => {
-    widgetMgr.toggleEditMode();
-  });
-
-  document.getElementById('btn-toggle-fullscreen').addEventListener('click', async () => {
-    await window.api.toggleFullscreenHud();
-  });
+  // 7. Edit mode toggle button
+  const btnEdit = document.getElementById('btn-edit-widgets');
+  if (btnEdit) {
+    btnEdit.addEventListener('click', () => {
+      widgetMgr.toggleEditMode();
+    });
+  }
 });

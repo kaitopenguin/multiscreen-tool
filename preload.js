@@ -6,7 +6,13 @@ contextBridge.exposeInMainWorld('api', {
   saveConfig: (cfg) => ipcRenderer.invoke('save-config', cfg),
   scanVideos: () => ipcRenderer.invoke('scan-videos'),
   launchSecondary: (options) => ipcRenderer.invoke('launch-secondary', options),
+  closeSecondary: () => ipcRenderer.invoke('close-secondary'),
+  setDockMode: (mode) => ipcRenderer.invoke('set-dock-mode', mode),
+  setTheme: (theme) => ipcRenderer.invoke('set-theme', theme),
   toggleFullscreenHud: () => ipcRenderer.invoke('toggle-fullscreen-hud'),
+  startWallpaper: (options) => ipcRenderer.invoke('start-wallpaper', options),
+  stopWallpaper: () => ipcRenderer.invoke('stop-wallpaper'),
+  getWallpaperStatus: () => ipcRenderer.invoke('get-wallpaper-status'),
   onTelemetry: (callback) => {
     ipcRenderer.on('telemetry-update', (event, data) => callback(data));
   },

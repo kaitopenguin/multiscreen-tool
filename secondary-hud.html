@@ -3,144 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secondary Display HUD</title>
+  <title>Multiscreen Tool - Secondary HUD</title>
   <link rel="stylesheet" href="src/css/impeccable-ios.css">
   <style>
-    body {
-      background: #050811;
-      width: 100vw;
-      min-height: 100vh;
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: transparent;
       overflow-y: auto;
       overflow-x: hidden;
-      position: relative;
-    }
-    /* Video Wallpaper Layer */
-    #bg-video-wrapper {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 0;
-      overflow: hidden;
-      pointer-events: none;
-    }
-    #bg-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    #bg-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(5, 8, 17, 0.42);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
-    /* Secondary HUD Layout */
-    .hud-main-container {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      min-height: 100vh;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    /* Top Bar */
-    .hud-nav-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(17, 25, 46, 0.7);
-      backdrop-filter: blur(28px);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-full);
-      padding: 8px 18px;
-      box-shadow: var(--shadow-ios);
-    }
-    .hud-brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .hud-status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent-cyan);
-      box-shadow: 0 0 10px var(--accent-cyan);
-    }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .btn-nav-pill {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #fff;
-      padding: 4px 12px;
-      border-radius: var(--radius-full);
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-nav-pill:hover {
-      background: rgba(255, 255, 255, 0.18);
-    }
-    /* Bento Grid Layout - Optimized for Vertical Screen */
-    .bento-vertical-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      width: 100%;
     }
   </style>
 </head>
-<body>
+<body class="theme-arch">
 
-  <!-- Fullscreen Video Wallpaper Background Layer -->
-  <div id="bg-video-wrapper">
-    <video id="bg-video" autoplay loop muted playsinline></video>
-    <div id="bg-overlay"></div>
-  </div>
-
-  <!-- Secondary Screen Foreground HUD -->
-  <div class="hud-main-container">
+  <!-- Docked Sidebar HUD Container -->
+  <div class="hud-wrapper">
     
-    <!-- Top Floating Navigation Bar -->
-    <header class="hud-nav-bar">
-      <div class="hud-brand">
-        <div class="hud-status-dot"></div>
-        <span>SECONDARY HUD</span>
-        <span id="badge-fps-val" style="font-family: var(--font-mono); font-size: 10px; color: var(--accent-cyan);">60 FPS</span>
+    <!-- Arch Linux Hyprland / Waybar Header Pill Bar -->
+    <header class="waybar-header">
+      <div class="waybar-group-left">
+        <div class="waybar-logo-pill">
+          <div class="waybar-status-dot"></div>
+          <span id="header-brand-tag">ARCH // WAYBAR</span>
+        </div>
+        <span class="waybar-action-chip" id="hdr-cpu-chip" title="CPU Load"> 15%</span>
+        <span class="waybar-action-chip" id="hdr-mem-chip" title="RAM Usage"> 8.4G</span>
       </div>
 
-      <div class="nav-actions">
-        <button id="btn-edit-widgets" class="btn-nav-pill" title="Customize Widgets">
-          <span>✨</span>
-          <span>Customize</span>
-        </button>
-        <button id="btn-toggle-fullscreen" class="btn-nav-pill" title="Toggle Fullscreen">
-          <span>⛶</span>
-        </button>
+      <div class="waybar-group-right">
+        <!-- Theme Quick Selector -->
+        <select id="hud-theme-select" class="waybar-select" title="Switch Theme">
+          <option value="arch">Arch Linux</option>
+          <option value="frutiger">Frutiger Aero</option>
+          <option value="retro">Retro CRT</option>
+          <option value="modern">Modern Slate</option>
+        </select>
+
+        <!-- Dock Position Controls -->
+        <button id="btn-dock-left" class="waybar-action-chip" title="Dock Left Side (Treo bên trái)">◧</button>
+        <button id="btn-dock-right" class="waybar-action-chip" title="Dock Right Side (Treo bên phải)">◨</button>
+        <button id="btn-dock-full" class="waybar-action-chip" title="Full Width (Toàn màn hình)">⛶</button>
+
+        <!-- Customize Widgets Button -->
+        <button id="btn-edit-widgets" class="waybar-action-chip" title="Customize Widgets">✨</button>
       </div>
     </header>
 
-    <!-- Bento Grid Container (Populated dynamically by WidgetManager) -->
-    <div id="bento-widget-container" class="bento-vertical-grid"></div>
+    <!-- Modular Widget Bento Container -->
+    <main id="bento-widget-container" class="widget-grid-container"></main>
 
   </div>
 

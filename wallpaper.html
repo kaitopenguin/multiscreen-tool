@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Wallpaper Engine</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+      user-select: none;
+    }
+    #video-player {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #overlay-tint {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: rgba(0, 0, 0, 0.2);
+    }
+    #no-video-placeholder {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255, 255, 255, 0.4);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <video id="video-player" autoplay loop muted playsinline></video>
+  <div id="overlay-tint"></div>
+  <div id="no-video-placeholder">No video selected.<br>Choose a video in Control Center.</div>
+
+  <script>
+    const player = document.getElementById('video-player');
+    const overlay = document.getElementById('overlay-tint');
+    const placeholder = document.getElementById('no-video-placeholder');
+
+    function applyConfig(cfg) {
+      if (!cfg) return;
+      if (cfg.videoPath) {
+        placeholder.style.display = 'none';
+        if (player.src !== 'file:///' + cfg.videoPath.replace(/\\/g, '/') && player.getAttribute('data-raw') !== cfg.videoPath) {
+          player.setAttribute('data-raw', cfg.videoPath);
+          player.src = 'file:///' + cfg.videoPath.replace(/\\/g, '/');
+          player.load();
+          player.play().catch(e => console.log('Autoplay deferred:', e));
+        }
+      } else {
+        placeholder.style.display = 'block';
+        player.src = '';
+      }
+      player.muted = cfg.videoMuted !== false;
+      player.volume = typeof cfg.videoVolume === 'number' ? cfg.videoVolume : 0.5;
+      player.playbackRate = typeof cfg.videoSpeed === 'number' ? cfg.videoSpeed : 1.0;
+      player.style.objectFit = cfg.videoFit || 'cover';
+      overlay.style.background = `rgba(0, 0, 0, ${cfg.videoOverlayOpacity || 0.2})`;
+    }
+
+    if (window.api) {
+      window.api.getConfig().then(applyConfig);
+      window.api.onConfigUpdated(applyConfig);
+    }
+  </script>
+</body>
+</html>

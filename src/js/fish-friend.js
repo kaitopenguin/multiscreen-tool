@@ -41,10 +41,17 @@ class FishFriendTank {
     };
 
     this.mouse = { x: 0, y: 0, active: false };
+    this.destroyed = false;
+    this.animId = null;
     this.initCanvas();
     this.initPlants();
     this.bindEvents();
     this.loop();
+  }
+
+  destroy() {
+    this.destroyed = true;
+    if (this.animId) cancelAnimationFrame(this.animId);
   }
 
   initCanvas() {
@@ -585,8 +592,9 @@ class FishFriendTank {
   }
 
   loop() {
+    if (this.destroyed) return;
     this.update();
     this.draw();
-    requestAnimationFrame(() => this.loop());
+    this.animId = requestAnimationFrame(() => this.loop());
   }
 }

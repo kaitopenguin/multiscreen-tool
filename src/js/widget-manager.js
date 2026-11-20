@@ -101,12 +101,12 @@ class WidgetManager {
   constructor(options = {}) {
     this.container = options.container || document.getElementById('bento-widget-container');
     this.activeWidgets = options.activeWidgets || [
+      'arch-waybar-status',
       'fish-tank',
       'ios-clock',
       'system-telemetry',
       'ios-weather',
       'dynamic-music',
-      'arch-waybar-status',
       'macro-deck',
       'model-rotator',
     ];
@@ -373,6 +373,9 @@ class WidgetManager {
     // 1. Initialize Fish Tank if present
     const fishCanvas = document.getElementById('fish-tank-canvas');
     if (fishCanvas) {
+      if (window.fishTankInstance && window.fishTankInstance.destroy) {
+        window.fishTankInstance.destroy();
+      }
       window.fishTankInstance = new FishFriendTank('fish-tank-canvas');
       const feedBtn = document.getElementById('tile-feed-fish');
       if (feedBtn) {
@@ -401,16 +404,18 @@ class WidgetManager {
   }
 
   animateSpectrum() {
+    if (this.spectrumAnimId) cancelAnimationFrame(this.spectrumAnimId);
     let phase = 0;
     const update = () => {
-      phase += 0.08;
       const bars = document.querySelectorAll('.spectrum-bar');
+      if (bars.length === 0) return;
+      phase += 0.08;
       bars.forEach((bar, i) => {
-        const h = (Math.sin(phase + i * 0.4) * 0.5 + 0.5) * 20 + 4;
+        const h = (Math.sin(phase + i * 0.4) * 0.5 + 0.5) * 16 + 3;
         bar.style.height = `${h}px`;
       });
-      requestAnimationFrame(update);
+      this.spectrumAnimId = requestAnimationFrame(update);
     };
-    requestAnimationFrame(update);
+    this.spectrumAnimId = requestAnimationFrame(update);
   }
 }
